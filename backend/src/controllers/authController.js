@@ -61,7 +61,66 @@ const signup= async(req,res)=>{
 
 };
 
+const login=async(req,res)=>{
+    
+    try{
+
+        const{email,password}=req.body;
+        
+        if(!email||!password){
+            return res.status(400).json({
+                success:false,
+                message:"ALL Fields Needed",
+            });
+        }
+
+        const user=await User.findOne({email});
+
+        if(!user){
+
+            return res.status(400).json({
+                success:false,
+                message:"User Not Found",
+            });
+        }
+
+        const isMatch=await bcrypt.compare(password,user.password);
+
+        if(!isMatch){
+            return res.status(400).json({
+                success:false,
+                message:"Password Incorrect",
+            });
+        }
+
+        const token=jwt.sign(
+            {id:user._id},
+            process.env.JWT_SECRET,
+            {expiresIn:"7d"}
+        );
+
+
+        const {password:pass,...userData}=user.toObject();
+
+        return res.status(201).json({
+            success:true,
+            token,
+            user:userData,
+        });
+
+
+    }catch(err){
+
+        return res.status(500).json({
+            success:false,
+            message:"Sever error"
+        });
+    }
+};
+
+
 module.exports={
     signup,
+    login,
 
 };
