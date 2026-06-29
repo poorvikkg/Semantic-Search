@@ -4,18 +4,18 @@ const createChat=async(req,res)=>{
     
     try{
 
-        const {reciverId}=req.body;
+        const {receiverId}=req.body;
         
         const senderId=req.user._id;
 
-        if(senderId.to_string()===reciverId){
+        if(senderId.toString()===reciverId){
             return res.status(400).json({
                 sucess:false,
                 message:"Cant send to you"
             });
         }
 
-        const existingChat=await chat.findOne({
+        const existingChat=await Chat.findOne({
 
             members:{
                 $all:[senderId,reciverId],
@@ -79,7 +79,7 @@ const getMyChats=async (req,res)=>{
    }
 };
 
-module.exporst={
+module.exports={
     createChat,
     getMyChats,
 }
