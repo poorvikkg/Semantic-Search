@@ -49,4 +49,55 @@ const sendMessage=async(req,res)=>{
     }
 }
 
-module.exports={sendMessage};
+const getMessages=async(req,res)=>{
+   try{
+    
+
+    const {chatId}=req.params;
+
+    const userId=req.user._id;
+
+    const chat = await Chat.findById(chatId);
+
+    if(!chat){
+        return res.status(500).json({
+            success:false,
+            message:"not converesation happened"
+        });
+    }
+
+    const isMember=await chat.members.some(
+        member=>member.toString()===userId.toString()
+    );
+
+    if(!isMember){
+        return res.status(400).json({
+            success:false,
+            message:"No member present"
+        });
+    }
+
+    const messages=await Message.find({
+        chatId
+    }).populate(
+        "sender","name email"
+    ).sort({
+        createdAt:1
+    });
+
+    return res.status(200).json({
+        success:true,
+        messages
+    });
+
+     
+   }catch(err){
+
+    return res.status(500).json({
+        success:false,
+        message:err.message
+    });
+   }
+}
+
+module.exports={sendMessage,getMessages};

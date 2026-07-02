@@ -3,10 +3,10 @@ const express=require("express");
 const router=express.Router();
 const authMiddleware=require("../middleware/authMiddleware");
 
-const {sendMessage}=require("../controllers/messageController");
+const {sendMessage,getMessages}=require("../controllers/messageController");
 
 router.post("/",authMiddleware,sendMessage);
 
-// router.get("/:chatId",authMiddleware,getMessages);
+router.get("/:chatId",authMiddleware,getMessages);
 
 module.exports=router;
